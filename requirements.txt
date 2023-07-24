@@ -6,6 +6,5 @@ phonemizer==2.2.1
 scipy
 tensorboard
 torch
-torchvision
 Unidecode==1.1.1
 g2p-id-py
