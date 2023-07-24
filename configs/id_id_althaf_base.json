@@ -20,8 +20,8 @@
     "c_kl": 1.0
   },
   "data": {
-    "training_files": "filelists/ljs_audio_text_train_filelist.txt.cleaned", // TODO
-    "validation_files": "filelists/ljs_audio_text_val_filelist.txt.cleaned", // TODO
+    "training_files": "filelists/id-ID-Althaf_text_train_filelist.cleaned",
+    "validation_files": "filelists/id-ID-Althaf_text_val_filelist.txt.cleaned",
     "text_cleaners": [
       "indonesian_cleaners"
     ],

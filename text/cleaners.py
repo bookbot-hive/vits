@@ -115,5 +115,5 @@ def english_cleaners2(text):
 def indonesian_cleaners(text):
     """Pipeline for Indonesian text, including phonemization + punctuation"""
     phonemes = g2p(text)
-    phonemes = "| |".join(["|".join(phn) for phn in phonemes])
+    phonemes = "# #".join(["#".join(phn) for phn in phonemes])
     return phonemes
