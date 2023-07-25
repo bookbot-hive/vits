@@ -3,6 +3,7 @@ import os
 import random
 import torch
 from torch import nn
+from torch.cuda.amp import autocast
 import torch.nn.functional as F
 import torch.utils.data
 import numpy as np
@@ -106,7 +107,7 @@ def mel_spectrogram_torch(y, n_fft, num_mels, sampling_rate, hop_size, win_size,
     y = y.squeeze(1)
 
     # https://github.com/jaywalnut310/vits/issues/15#issuecomment-1084148441
-    with torch.autocast(device_type="cuda", enabled=False):
+    with autocast(enabled=False):
         y = y.float()
         spec = torch.stft(y, n_fft, hop_length=hop_size, win_length=win_size, window=hann_window[wnsize_dtype_device],
                         center=center, pad_mode='reflect', normalized=False, onesided=True, return_complex=False)
