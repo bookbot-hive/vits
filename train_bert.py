@@ -16,7 +16,6 @@ global_step = 0
 
 def main():
     hps = utils.get_hparams()
-    hps.train.learning_rate = 1e-3
     run(hps)
 
 

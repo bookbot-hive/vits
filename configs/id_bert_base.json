@@ -1,0 +1,37 @@
+{
+  "train": {
+    "log_interval": 200,
+    "eval_interval": 1000,
+    "seed": 1234,
+    "epochs": 1,
+    "learning_rate": 1e-3,
+    "betas": [
+      0.8,
+      0.99
+    ],
+    "eps": 1e-9,
+    "batch_size": 64,
+    "fp16_run": true,
+    "lr_decay": 0.999875,
+    "init_lr_ratio": 1,
+    "warmup_epochs": 0
+  },
+  "data": {
+    "training_files": "filelists/wikipedia_id_text_train_filelist.txt.cleaned",
+    "validation_files": "filelists/wikipedia_id_text_val_filelist.txt.cleaned",
+    "text_cleaners": [
+      "indonesian_cleaners"
+    ],
+    "add_blank": true,
+    "cleaned_text": true
+  },
+  "model": {
+    "inter_channels": 192,
+    "hidden_channels": 192,
+    "filter_channels": 768,
+    "n_heads": 2,
+    "n_layers": 6,
+    "kernel_size": 3,
+    "p_dropout": 0.1
+  }
+}
