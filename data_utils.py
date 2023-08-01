@@ -9,6 +9,89 @@ import commons
 from mel_processing import spectrogram_torch
 from utils import load_wav_to_torch, load_filepaths_and_text
 from text import text_to_sequence, cleaned_text_to_sequence
+from text.symbols import symbols, MASK_TOKEN_ID, PAD_TOKEN_ID
+
+class TextLoader(torch.utils.data.Dataset):
+    """
+        1) loads audio, text pairs
+        2) normalizes text and converts them to sequences of integers
+    """
+    def __init__(self, audiopaths_and_text, hparams):
+        self.audiopaths_and_text = load_filepaths_and_text(audiopaths_and_text)
+        self.text_cleaners  = hparams.text_cleaners
+
+        self.cleaned_text = getattr(hparams, "cleaned_text", False)
+
+        self.add_blank = hparams.add_blank
+
+        random.seed(1234)
+        random.shuffle(self.audiopaths_and_text)
+
+    def get_text(self, text):
+        if self.cleaned_text:
+            text_norm = cleaned_text_to_sequence(text)
+        else:
+            text_norm = text_to_sequence(text, self.text_cleaners)
+        if self.add_blank:
+            text_norm = commons.intersperse(text_norm, 0)
+        text_norm = torch.LongTensor(text_norm)
+        return text_norm
+
+    def __getitem__(self, index):
+        return self.get_text(self.audiopaths_and_text[index][1])
+
+    def __len__(self):
+        return len(self.audiopaths_and_text)
+
+
+class DataCollatorForLanguageModeling():
+    """ Zero-pads model inputs and targets, perform masking
+    """
+    def __init__(self, mlm_probability: float = 0.15):
+        self.mlm_probability = mlm_probability
+
+    def __call__(self, batch):
+        # Right zero-pad all one-hot text sequences to max input length
+        max_text_len = max([len(x) for x in batch])
+
+        text_lengths = torch.LongTensor(len(batch))
+
+        text_padded = torch.LongTensor(len(batch), max_text_len)
+        text_padded.zero_()
+
+        for i, text in enumerate(batch):
+            text_padded[i, :text.size(0)] = text
+            text_lengths[i] = text.size(0)
+        
+        text_padded, labels = self.mask_tokens(text_padded)
+
+        return text_padded, text_lengths, labels
+
+    def mask_tokens(self, inputs):
+        """
+        Prepare masked tokens inputs/labels for masked language modeling: 80% MASK, 10% random, 10% original.
+        """
+        labels = inputs.clone()
+        # We sample a few tokens in each sequence for MLM training (with probability `self.mlm_probability`)
+        probability_matrix = torch.full(labels.shape, self.mlm_probability)
+        special_tokens_mask = [[1 if i == PAD_TOKEN_ID else 0 for i in val] for val in labels.tolist()]
+        special_tokens_mask = torch.tensor(special_tokens_mask, dtype=torch.bool)
+
+        probability_matrix.masked_fill_(special_tokens_mask, value=0.0)
+        masked_indices = torch.bernoulli(probability_matrix).bool()
+        labels[~masked_indices] = -100  # We only compute loss on masked tokens
+
+        # 80% of the time, we replace masked input tokens with tokenizer.mask_token ([MASK])
+        indices_replaced = torch.bernoulli(torch.full(labels.shape, 0.8)).bool() & masked_indices
+        inputs[indices_replaced] = MASK_TOKEN_ID
+
+        # 10% of the time, we replace masked input tokens with random word
+        indices_random = torch.bernoulli(torch.full(labels.shape, 0.5)).bool() & masked_indices & ~indices_replaced
+        random_words = torch.randint(len(symbols), labels.shape, dtype=torch.long)
+        inputs[indices_random] = random_words[indices_random]
+
+        # The rest of the time (10% of the time) we keep the masked input tokens unchanged
+        return inputs, labels
 
 
 class TextAudioLoader(torch.utils.data.Dataset):

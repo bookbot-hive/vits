@@ -3,6 +3,7 @@
 """
 Defines the set of symbols used in text input to the model.
 """
+_mask = "[MASK]"
 _pad = "_"
 _punctuation = ";:,.!? "
 _letters_ipa = [
@@ -40,7 +41,9 @@ _letters_ipa = [
 
 
 # Export all symbols:
-symbols = [_pad] + list(_punctuation) + _letters_ipa
+symbols = [_pad] + list(_punctuation) + _letters_ipa + [_mask]
 
 # Special symbol ids
 SPACE_ID = symbols.index(" ")
+MASK_TOKEN_ID = symbols.index(_mask)
+PAD_TOKEN_ID = symbols.index(_pad)
