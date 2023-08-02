@@ -42,7 +42,7 @@ def run(hps):
         eval_dataset,
         num_workers=8,
         shuffle=False,
-        batch_size=hps.train.batch_size,
+        batch_size=hps.train.batch_size * 2,
         pin_memory=True,
         drop_last=False,
         collate_fn=collate_fn,

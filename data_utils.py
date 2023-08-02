@@ -28,19 +28,6 @@ class TextLoader(torch.utils.data.Dataset):
 
         random.seed(1234)
         random.shuffle(self.audiopaths_and_text)
-        self._filter()
-    
-    def _filter(self):
-        """
-        Filter text lengths
-        """
-
-        audiopaths_and_text_new = []
-        for audiopath, text in self.audiopaths_and_text:
-            num_tokens = len(text.split("#"))
-            if self.min_text_len <= num_tokens and num_tokens <= self.max_text_len:
-                audiopaths_and_text_new.append([audiopath, text])
-        self.audiopaths_and_text = audiopaths_and_text_new
 
     def get_text(self, text):
         if self.cleaned_text:
@@ -49,6 +36,9 @@ class TextLoader(torch.utils.data.Dataset):
             text_norm = text_to_sequence(text, self.text_cleaners)
         if self.add_blank:
             text_norm = commons.intersperse(text_norm, 0)
+
+        # truncate tokens to a certain max length
+        text_norm = text_norm[:self.max_text_len]
         text_norm = torch.LongTensor(text_norm)
         return text_norm
 
