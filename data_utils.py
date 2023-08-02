@@ -23,9 +23,24 @@ class TextLoader(torch.utils.data.Dataset):
         self.cleaned_text = getattr(hparams, "cleaned_text", False)
 
         self.add_blank = hparams.add_blank
+        self.min_text_len = getattr(hparams, "min_text_len", 1)
+        self.max_text_len = getattr(hparams, "max_text_len", 190)
 
         random.seed(1234)
         random.shuffle(self.audiopaths_and_text)
+        self._filter()
+    
+    def _filter(self):
+        """
+        Filter text lengths
+        """
+
+        audiopaths_and_text_new = []
+        for audiopath, text in self.audiopaths_and_text:
+            num_tokens = len(text.split("#"))
+            if self.min_text_len <= num_tokens and num_tokens <= self.max_text_len:
+                audiopaths_and_text_new.append([audiopath, text])
+        self.audiopaths_and_text = audiopaths_and_text_new
 
     def get_text(self, text):
         if self.cleaned_text:
