@@ -131,7 +131,7 @@ def train_and_evaluate(
                 scalars=scalar_dict,
             )
 
-        if global_step % hps.train.eval_interval == 0:
+        if global_step % hps.train.eval_interval == 0 and global_step != 0:
             evaluate(hps, model, eval_loader, logger, writer_eval)
             utils.save_checkpoint(
                 model,
