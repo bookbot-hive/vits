@@ -30,7 +30,7 @@ def run(hps):
     collate_fn = DataCollatorForLanguageModeling()
     train_loader = DataLoader(
         train_dataset,
-        num_workers=8,
+        num_workers=4,
         shuffle=True,
         pin_memory=True,
         collate_fn=collate_fn,
@@ -40,7 +40,7 @@ def run(hps):
     eval_dataset = TextLoader(hps.data.validation_files, hps.data)
     eval_loader = DataLoader(
         eval_dataset,
-        num_workers=8,
+        num_workers=4,
         shuffle=False,
         batch_size=hps.train.batch_size * 2,
         pin_memory=True,
