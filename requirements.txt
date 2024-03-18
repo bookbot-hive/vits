@@ -1,4 +1,4 @@
---extra-index-url https://download.pytorch.org/whl/cu117
+--extra-index-url https://download.pytorch.org/whl/cu118
 Cython==0.29.21
 librosa
 matplotlib
@@ -10,3 +10,4 @@ torch
 Unidecode==1.1.1
 Pillow==9.5.0
 g2p-id-py
+gruut
