@@ -10,4 +10,4 @@ torch
 Unidecode==1.1.1
 Pillow==9.5.0
 g2p-id-py
-gruut
+gruut[sw] -f https://synesthesiam.github.io/prebuilt-apps/
